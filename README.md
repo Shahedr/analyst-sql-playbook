@@ -1,5 +1,7 @@
 # Analyst SQL Playbook
 
+[![sql-tests](https://github.com/Shahedr/analyst-sql-playbook/actions/workflows/sql-tests.yml/badge.svg)](https://github.com/Shahedr/analyst-sql-playbook/actions/workflows/sql-tests.yml) ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-4169E1) ![MIT License](https://img.shields.io/badge/license-MIT-green)
+
 A hands-on PostgreSQL practice repo built around realistic analyst questions instead of isolated syntax drills.
 
 The dataset models a small online retailer with customers, orders, products, and order items. The exercises move from core KPI work into window functions, customer segmentation, and retention analysis.
