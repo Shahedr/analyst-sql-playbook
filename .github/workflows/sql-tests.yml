@@ -1,0 +1,50 @@
+name: sql-tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: analyst
+          POSTGRES_PASSWORD: analyst
+          POSTGRES_DB: sql_playbook
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U analyst -d sql_playbook"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      PGPASSWORD: analyst
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Build practice dataset
+        run: |
+          psql -h localhost -U analyst -d sql_playbook -v ON_ERROR_STOP=1 -f sql/00_schema.sql
+          psql -h localhost -U analyst -d sql_playbook -v ON_ERROR_STOP=1 -f sql/01_seed.sql
+
+      - name: Validate seed data
+        run: psql -h localhost -U analyst -d sql_playbook -v ON_ERROR_STOP=1 -f tests/validate.sql
+
+      - name: Run solution queries
+        run: |
+          psql -h localhost -U analyst -d sql_playbook -v ON_ERROR_STOP=1 -f solutions/01_core_analytics.sql
+          psql -h localhost -U analyst -d sql_playbook -v ON_ERROR_STOP=1 -f solutions/02_window_functions.sql
+          psql -h localhost -U analyst -d sql_playbook -v ON_ERROR_STOP=1 -f solutions/03_customer_retention.sql
